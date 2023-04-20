@@ -13,7 +13,9 @@
   (:gen-class))
 
 (defroutes app-routes
-  (POST "/pix" [] pix-transfer-handler)
+  (POST "/create-user" [] (mj/wrap-json-body create-user-handler {:keywords? true :bigdecimals? true}))
+  (POST "/create-pix-key" [] (mj/wrap-json-body create-pix-key-handler {:keywords? true :bigdecimals? true}))
+  (POST "/pix" [] (mj/wrap-json-body pix-transfer-handler {:keywords? true :bigdecimals? true}))
   (POST "/ted" [] ted-transfer-handler))
 
 (defn -main
