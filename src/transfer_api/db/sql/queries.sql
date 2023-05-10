@@ -25,8 +25,8 @@ update accounts set balance = :balance where id = (:id)::uuid
 -- A :result value of :n below will return affected rows:
 -- :name sql-search-user-by-id :! :m
 -- :doc Persist an account on database
-select * from users
-where id = (:id)::uuid
+select * from users inner join accounts on users.id = accounts.user_id
+where users.id = (:id)::uuid
 
 -- A :result value of :n below will return affected rows:
 -- :name sql-search-account-by-user_id :! :m
@@ -39,4 +39,9 @@ where user_id = (:user_id)::uuid
 -- :doc Persist an account on database
 select * from pix_keys inner join accounts on pix_keys.account_id = accounts.id
 where key = :recipient_key
+
+-- A :result value of :n below will return affected rows:
+-- :name sql-search-account-by-account_number-and-agency_number :! :m
+-- :doc Persist an account on database
+select * from accounts where account_number = :account_number and agency_number = :agency_number
 

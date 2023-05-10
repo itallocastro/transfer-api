@@ -13,10 +13,11 @@
   (:gen-class))
 
 (defroutes app-routes
+  (GET "/verify-user" [] (mj/wrap-json-body verify-user-handler {:keywords? true :bigdecimals? true}))
   (POST "/create-user" [] (mj/wrap-json-body create-user-handler {:keywords? true :bigdecimals? true}))
   (POST "/create-pix-key" [] (mj/wrap-json-body create-pix-key-handler {:keywords? true :bigdecimals? true}))
   (POST "/pix" [] (mj/wrap-json-body pix-transfer-handler {:keywords? true :bigdecimals? true}))
-  (POST "/ted" [] ted-transfer-handler))
+  (POST "/ted" [] (mj/wrap-json-body ted-transfer-handler {:keywords? true :bigdecimals? true})))
 
 (defn -main
   "I don't do a whole lot ... yet."

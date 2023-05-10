@@ -10,6 +10,17 @@
             [transfer-api.transfer.database :as d])
   (:gen-class))
 
+(defn verify-user-handler
+  [req]
+  (let [
+         id (-> req :params :id)
+         user (d/get-user-by-id id)
+         ]
+    (log/info id)
+    {:status  200
+     :headers {"Content-type" "application/json"}
+     :body (json/write-str user)
+     }))
 (defn create-user-handler [req]
   (let [user_json (:body req)
         saved (try
@@ -24,7 +35,7 @@
     {:status  (if saved 201 400)
      :headers {"Content-Type" "text/html"}
      :body    (when (not saved)
-                "error or saving tweet")}))
+                "error")}))
 
 (defn create-pix-key-handler [req]
   (let [pix_json (:body req)
@@ -39,7 +50,7 @@
     {:status  (if saved 201 400)
      :headers {"Content-Type" "text/html"}
      :body    (when (not saved)
-                "error or saving tweet")}))
+                "error")}))
 
 (defn pix-transfer-handler [req]
   (let [pix_json (:body req)
@@ -56,16 +67,25 @@
     (log/info (get from_account 0))
     (log/info recipient_account)
     (log/info (get pix_json "value"))
-    {:status  (if saved 201 400)
+    {:status  (if saved 200 400)
      :headers {"Content-Type" "text/html"}
      :body    (when (not saved)
-                "error or saving tweet")}))
+                "error")}))
 
 (defn ted-transfer-handler
   [req]
-  (let [test (:body req)])
-  {:status  200
+  (let [ted_json (:body req)
+        from_account (d/search-account-by-account_number-and-agency_number {:agency_number (get ted_json :from_agency_number) :account_number (get ted_json :from_account_number)})
+        recipient_account (d/search-account-by-account_number-and-agency_number {:agency_number (get ted_json :to_agency_number) :account_number (get ted_json :to_account_number)})
+        saved (try
+                (d/update-balance (get from_account 0) (get recipient_account 0) (get ted_json :value))
+                (catch Exception e
+                  (do
+                    (log/error e)
+                    false)))
+        ]
+
+  {:status  (if saved 200 400)
    :headers {"Content-Type" "text/html"}
-   :body    (->>
-             (pp/pprint test)
-             (str "Request Object: " test))})
+   :body    (when (not saved)
+              "error")}))

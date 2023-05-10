@@ -7,6 +7,15 @@
   (:import java.util.UUID)
   (:gen-class))
 
+(defn get-user-by-id
+  "get user by id"
+  [id]
+  (let [result (sql-search-user-by-id db {:id id})]
+    (log/info result)
+    (map #(assoc %
+           :id (str (:id %))
+           :user_id (str (:user_id %))
+           :created_at (str (:created_at %))) result)))
 (defn create-user
   "create user"
   [user]
@@ -30,6 +39,11 @@
   "search account by pix key"
   [pix_json]
   (sql-search-pix-keys-recipient db pix_json))
+
+(defn search-account-by-account_number-and-agency_number "search account by account_number and agency_number"
+  [data]
+  (log/info data)
+  (sql-search-account-by-account_number-and-agency_number db data))
 
 (defn update-balance
   "search account by pix key"
